@@ -10,15 +10,15 @@ import SwiftUI
 struct ContentView: View {
     var viewModel: EmojiMemoryGame
     
-    
     var body: some View {
-        HStack() {
-            ForEach(viewModel.cards) { card in
+        let shuffled = viewModel.cards.shuffled()
+        return HStack(content:  {
+            ForEach(shuffled, content: { card in
                 CardView(card: card).onTapGesture{
                     viewModel.choose(card: card)
                 }
-            }
-        }
+            })
+        })
         .foregroundColor(.orange)
         .padding()
         .font(.largeTitle)
