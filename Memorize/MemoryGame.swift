@@ -8,12 +8,13 @@
 import Foundation
 
 struct MemoryGame<CardContent> {
-    var cards: Array<Card>
+    private(set) var cards: Array<Card>
     
-    mutating func choos(card: Card){
+    mutating func choose(_ card: Card){
         print("card chosen: \(card)")
         let chosenIndex: Int = self.index(of: card)
-        self.cards[chosenIndex].isFaceUp = !self.cards[chosenIndex].isFaceUp
+        //self.cards[chosenIndex].isFaceUp = !self.cards[chosenIndex].isFaceUp
+        cards[chosenIndex].isFaceUp.toggle()
     }
     
     func index(of card: Card) -> Int {
@@ -32,10 +33,15 @@ struct MemoryGame<CardContent> {
             cards.append(Card(content: content, id: pairIndex*2))
             cards.append(Card(content: content, id: pairIndex*2+1))
         }
+        shuffleCards(cards)
+    }
+    
+    mutating func shuffleCards (_ cards: Array<Card>){
+        self.cards.shuffle()
     }
     
     struct Card: Identifiable {
-        var isFaceUp: Bool = true
+        var isFaceUp: Bool = false
         var isMatched: Bool = false
         var content: CardContent
         var id: Int
