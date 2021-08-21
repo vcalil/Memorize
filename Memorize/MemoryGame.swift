@@ -7,24 +7,43 @@
 
 import Foundation
 
-struct MemoryGame<CardContent> {
+struct MemoryGame<CardContent> where CardContent: Equatable {
     private(set) var cards: Array<Card>
     
-    mutating func choose(_ card: Card){
-        print("card chosen: \(card)")
-        let chosenIndex: Int = self.index(of: card)
-        //self.cards[chosenIndex].isFaceUp = !self.cards[chosenIndex].isFaceUp
-        cards[chosenIndex].isFaceUp.toggle()
-    }
+    private var indexOfTheOneAndOnlyFaceUpCard: Int?
     
-    func index(of card: Card) -> Int {
+    mutating func choose(_ card: Card){
+        //if let chosenIndex = self.index(of: card)
+        if let chosenIndex = cards.firstIndex(where: {$0.id == card.id}),
+           !cards[chosenIndex].isFaceUp,
+           !cards[chosenIndex].isMatched {
+            if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
+                if cards[chosenIndex].content == cards[potentialMatchIndex].content {
+                    cards[chosenIndex].isMatched = true
+                    cards[potentialMatchIndex].isMatched = true
+                }
+                indexOfTheOneAndOnlyFaceUpCard = nil
+            }else{
+                for index in cards.indices{
+                    cards[index].isFaceUp = false
+                }
+                indexOfTheOneAndOnlyFaceUpCard = chosenIndex
+            }
+            cards[chosenIndex].isFaceUp.toggle()
+        }
+        //self.cards[chosenIndex].isFaceUp = !self.cards[chosenIndex].isFaceUp
+        print("card chosen: \(card)")
+    }
+    /*
+    func index(of card: Card) -> Int? {
         for index in 0..<self.cards.count {
             if self.cards[index].id == card.id {
                 return index
             }
         }
-        return 0 //TODO: bogus!
+        return nil //TODO: bogus!
     }
+ */
     
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
         cards = Array<Card>()

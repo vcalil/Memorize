@@ -45,7 +45,25 @@ struct EmojiMemoryGameView: View {
     
 }
 
-
+struct CardView: View {
+    let card: MemoryGame<String>.Card
+    
+    var body: some View{
+        ZStack {
+            let shape = RoundedRectangle(cornerRadius: 20)
+            if card.isFaceUp {
+                shape.fill().foregroundColor(.white)
+                shape.strokeBorder(lineWidth: 3)
+                Text(card.content).font(.largeTitle)
+            }else if card.isMatched {
+                shape.opacity(0)
+            }else {
+                shape.fill()
+            }
+        }
+    }
+}
+/*
 struct CardView: View {
     var card: MemoryGame<String>.Card
     
@@ -76,7 +94,7 @@ struct CardView: View {
         min(size.width, size.height)*0.75
     }
 }
-
+*/
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
