@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    @ObservedObject var viewModel: EmojiMemoryGame
+    @ObservedObject var game: EmojiMemoryGame
     
     
     //@State var length = viewModel.cards
@@ -17,19 +17,19 @@ struct EmojiMemoryGameView: View {
         VStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(viewModel.cards, content: { card in
+                    ForEach(game.cards) { card in
                         CardView(card: card).aspectRatio(2/3, contentMode: .fit).onTapGesture{
-                            viewModel.choose(card: card)
+                            game.choose(card: card)
                         }
                         
-                    })
+                    }
                 }
             }.foregroundColor(.red)
         }.padding(.horizontal)
         Spacer()
         HStack {
             Button {
-                shuffle(model: viewModel)
+                shuffle(model: game)
             } label: {
                     Image(systemName: "minus.circle")
                 }
@@ -46,7 +46,7 @@ struct EmojiMemoryGameView: View {
 }
 
 struct CardView: View {
-    let card: MemoryGame<String>.Card
+    let card: EmojiMemoryGame.Card
     
     var body: some View{
         ZStack {
@@ -98,6 +98,6 @@ struct CardView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        EmojiMemoryGameView(viewModel: game).preferredColorScheme(.dark)
+        EmojiMemoryGameView(game: game).preferredColorScheme(.dark)
     }
 }
