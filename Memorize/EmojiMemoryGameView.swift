@@ -19,18 +19,29 @@ struct EmojiMemoryGameView: View {
         .padding(.horizontal)
     }
     
+    @State private var dealt = Set<Int>()
+    
+    private func deal(_ card: EmojiMemoryGame.Card) {
+        dealt.insert(card.id)
+    }
+    
+    func isUndealt(_ card: EmojiMemoryGame.Card) -> Bool {
+        !dealt.contains(card.id)
+    }
+    
     var gamebody: some View {
 //        VStack {
 //            ScrollView {
 //                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))]) {
 //                    ForEach(game.cards) { card in
-        AspectVGrid(items: game.cards, aspectRatio: 2/3, content: { card in
-            if card.isMatched && !card.isFaceUp {
+        AspectVGrid(items: game.cards, aspectRatio: CardConstants.aspectRatio, content: { card in
+            if isUndealt(card) || card.isMatched && !card.isFaceUp {
                 //Rectangle().opacity(0)
                 Color.clear
             }else {
                 CardView(card: card)
                     .padding(4)
+                    .transition(AnyTransition.asymmetric(insertion: .scale, removal: .opacity).animation(.easeInOut(duration: 3)))
                     .onTapGesture {
                         withAnimation {
                             game.choose(card: card)
@@ -38,17 +49,43 @@ struct EmojiMemoryGameView: View {
                     }
             }
         })
-        .foregroundColor(.red)
-        //.font(.largeTitle)
-    }
-    
-        var shuffle: some View {
-            Button("Shuffle") {
-                withAnimation {
-                    game.shuffle()
+        .onAppear {
+            // "deal" cards
+            withAnimation {
+                for card in game.cards {
+                    deal(card)
                 }
             }
         }
+        .foregroundColor(CardConstants.color)
+        //.font(.largeTitle)
+    }
+    
+    var deckBody: some View {
+        ZStack {
+            ForEach(game.cards.filter(isUndealt)) { card in
+                CardView(card: card)
+            }
+        }
+        .frame(width: CardConstants.undealWidth, height: CardConstants.undealHeight)
+    }
+    
+    var shuffle: some View {
+        Button("Shuffle") {
+            withAnimation {
+                game.shuffle()
+            }
+        }
+    }
+    
+    private struct CardConstants {
+        static let color = Color.red
+        static let aspectRatio: CGFloat = 2/3
+        static let dealDuration: Double = 0.5
+        static let totalDealDuration: Double = 2
+        static let undealHeight: CGFloat = 90
+        static let undealWidth = undealHeight * aspectRatio
+    }
 //
 //
 //                    }
@@ -66,11 +103,6 @@ struct EmojiMemoryGameView: View {
 //        }
 //        .font(.largeTitle)
 //        .padding(.horizontal)
-
-    
-    func shuffle(model: EmojiMemoryGame) {
-        game.shuffle()
-    }
     
 }
 
